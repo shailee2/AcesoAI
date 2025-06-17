@@ -40,11 +40,11 @@ const mealIdeas = [
 interface QuizData {
   name: string
   birthday: string
+  weight: number
+  height: number
   fitnessGoal: string
   activityLevel: string
   workoutDays: string[]
-  timePerWorkout: string
-  equipment: string[]
 }
 
 const ProfilePage = ({ userData, onBack }: { userData: QuizData; onBack: () => void }) => {
@@ -89,14 +89,18 @@ const ProfilePage = ({ userData, onBack }: { userData: QuizData; onBack: () => v
               <span className="font-medium">{userData.name}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Age:</span>
-              <span className="font-medium">{userData.birthday ? calculateAge(userData.birthday) : "N/A"}</span>
-            </div>
-            <div className="flex justify-between">
               <span className="text-gray-600">Birthday:</span>
               <span className="font-medium">
                 {userData.birthday ? new Date(userData.birthday).toLocaleDateString() : "N/A"}
               </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Height:</span>
+              <span className="font-medium">{userData.height}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Weight:</span>
+              <span className="font-medium">{userData.weight}</span>
             </div>
           </CardContent>
         </Card>
@@ -138,28 +142,6 @@ const ProfilePage = ({ userData, onBack }: { userData: QuizData; onBack: () => v
                 ))}
               </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Session Duration:</span>
-              <span className="font-medium">{userData.timePerWorkout} minutes</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Dumbbell className="h-5 w-5" />
-              Equipment
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {userData.equipment.map((item) => (
-                <Badge key={item} variant="default">
-                  {item}
-                </Badge>
-              ))}
-            </div>
           </CardContent>
         </Card>
       </div>
@@ -172,11 +154,11 @@ const WelcomeQuiz = ({ onComplete }: { onComplete: (userData: QuizData) => void 
   const [quizData, setQuizData] = useState<QuizData>({
     name: "",
     birthday: "",
+    height: 0,
+    weight: 0,
     fitnessGoal: "",
     activityLevel: "",
     workoutDays: [],
-    timePerWorkout: "",
-    equipment: [],
   })
 
   const updateQuizData = (field: keyof QuizData, value: any) => {
@@ -200,13 +182,13 @@ const WelcomeQuiz = ({ onComplete }: { onComplete: (userData: QuizData) => void 
       case 0:
         return quizData.name.trim() !== "" && quizData.birthday !== ""
       case 1:
-        return quizData.fitnessGoal !== ""
+        return quizData.height > 0 && quizData.weight > 0
       case 2:
-        return quizData.activityLevel !== ""
+        return quizData.fitnessGoal !== ""
       case 3:
-        return quizData.workoutDays.length > 0 && quizData.timePerWorkout !== ""
+        return quizData.activityLevel !== ""
       case 4:
-        return quizData.equipment.length > 0
+        return quizData.workoutDays.length > 0
       default:
         return false
     }
@@ -250,6 +232,38 @@ const WelcomeQuiz = ({ onComplete }: { onComplete: (userData: QuizData) => void 
       ),
     },
     {
+      title: "Let's get to know you",
+      icon: User,
+      content: (
+        <div className="space-y-4">
+          <div className="text-left">
+            <Label htmlFor="height" className="text-sm font-medium">
+              What's your height (in)?
+            </Label>
+            <Input
+              id="height"
+              placeholder="Enter your height"
+              value={quizData.height}
+              onChange={(e) => updateQuizData("height", e.target.value)}
+              className="mt-1"
+            />
+          </div>
+          <div className="text-left">
+            <Label htmlFor="weight" className="text-sm font-medium">
+              When's your weight (lbs)?
+            </Label>
+            <Input
+              id="weight"
+              placeholder="Enter your weight"
+              value={quizData.weight}
+              onChange={(e) => updateQuizData("weight", e.target.value)}
+              className="mt-1"
+            />
+          </div>
+        </div>
+      ),
+    },
+    {
       title: "What's your main fitness goal?",
       icon: Target,
       content: (
@@ -258,8 +272,8 @@ const WelcomeQuiz = ({ onComplete }: { onComplete: (userData: QuizData) => void 
             {[
               { value: "lose_weight", label: "Lose Weight", desc: "Burn fat and get leaner" },
               { value: "build_muscle", label: "Build Muscle", desc: "Gain strength and muscle mass" },
-              { value: "get_fit", label: "Get Fit", desc: "Improve overall fitness and health" },
-              { value: "maintain", label: "Stay Healthy", desc: "Maintain current fitness level" },
+              { value: "get_fit", label: "Body Recomposition", desc: "Improve overall fitness and health" },
+              { value: "maintain", label: "Maintain Weight", desc: "Maintain current fitness level" },
             ].map((goal) => (
               <div key={goal.value} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
                 <RadioGroupItem value={goal.value} id={goal.value} />
@@ -297,7 +311,7 @@ const WelcomeQuiz = ({ onComplete }: { onComplete: (userData: QuizData) => void 
       ),
     },
     {
-      title: "When do you prefer to work out?",
+      title: "What days do you prefer to work out?",
       icon: Clock,
       content: (
         <div className="space-y-6">
@@ -318,56 +332,9 @@ const WelcomeQuiz = ({ onComplete }: { onComplete: (userData: QuizData) => void 
               ))}
             </div>
           </div>
-
-          <div>
-            <Label className="text-sm font-medium mb-3 block">How long can you work out?</Label>
-            <RadioGroup
-              value={quizData.timePerWorkout}
-              onValueChange={(value) => updateQuizData("timePerWorkout", value)}
-            >
-              <div className="space-y-2">
-                {[
-                  { value: "15-30", label: "15-30 minutes" },
-                  { value: "30-45", label: "30-45 minutes" },
-                  { value: "45-60", label: "45-60 minutes" },
-                  { value: "60+", label: "60+ minutes" },
-                ].map((time) => (
-                  <div key={time.value} className="flex items-center space-x-2">
-                    <RadioGroupItem value={time.value} id={time.value} />
-                    <Label htmlFor={time.value}>{time.label}</Label>
-                  </div>
-                ))}
-              </div>
-            </RadioGroup>
-          </div>
         </div>
       ),
-    },
-    {
-      title: "What equipment do you have access to?",
-      icon: Dumbbell,
-      content: (
-        <div>
-          <Label className="text-sm font-medium mb-3 block">Select all that apply:</Label>
-          <div className="grid grid-cols-2 gap-2">
-            {["Dumbbells", "Barbell", "Resistance Bands", "Pull-up Bar", "Gym Membership", "Bodyweight Only"].map(
-              (equipment) => (
-                <div key={equipment} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={equipment}
-                    checked={quizData.equipment.includes(equipment)}
-                    onCheckedChange={(checked) => handleArrayUpdate("equipment", equipment, checked as boolean)}
-                  />
-                  <Label htmlFor={equipment} className="text-sm">
-                    {equipment}
-                  </Label>
-                </div>
-              ),
-            )}
-          </div>
-        </div>
-      ),
-    },
+    }
   ]
 
   const currentStepData = steps[currentStep]
@@ -449,11 +416,11 @@ export default function FitnessApp() {
   const [userData, setUserData] = useState<QuizData>({
     name: "Alex",
     birthday: "",
+    height: 0,
+    weight: 0,
     fitnessGoal: "",
     activityLevel: "",
     workoutDays: [],
-    timePerWorkout: "",
-    equipment: [],
   })
   const [question, setQuestion] = useState("")
   const [dailyCalories] = useState({ current: 1650, target: 2200 })
@@ -497,17 +464,8 @@ export default function FitnessApp() {
   }
 
   useEffect(() => {
-    // Check if quiz is completed
-    const quizCompleted = localStorage.getItem("fitnessQuizCompleted")
-    const storedUserData = localStorage.getItem("fitnessUserData")
-
-    if (quizCompleted && storedUserData) {
-      setUserData(JSON.parse(storedUserData))
-      setIsQuizCompleted(true)
-    } else {
-      setIsQuizCompleted(false)
-    }
-
+    // Always show the quiz - remove localStorage checks
+    setIsQuizCompleted(false)
     setIsLoading(false)
   }, [])
 
@@ -730,8 +688,9 @@ export default function FitnessApp() {
         onComplete={(quizData) => {
           setUserData(quizData)
           setIsQuizCompleted(true)
-          localStorage.setItem("fitnessQuizCompleted", "true")
-          localStorage.setItem("fitnessUserData", JSON.stringify(quizData))
+          // Remove these localStorage calls:
+          // localStorage.setItem("fitnessQuizCompleted", "true")
+          // localStorage.setItem("fitnessUserData", JSON.stringify(quizData))
         }}
       />
     )
