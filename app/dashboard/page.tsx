@@ -15,7 +15,7 @@ import { marked } from "marked"
 
 
 
-const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 const muscleGroups = ["Chest", "Back", "Legs", "Shoulders", "Arms", "Core", "Rest"]
 const mealIdeas = [
   { id: 1, name: "Protein Pancakes", calories: 320, image: "https://via.placeholder.com/200x120" },
@@ -142,9 +142,9 @@ export default function DashboardPage() {
   }  
 
   const [input, setInput] = useState("")
-const [response, setResponse] = useState("")
-const formatted = marked(response)
-const handleAsk = async (e: React.FormEvent) => {
+  const [response, setResponse] = useState("")
+  const formatted = marked(response)
+  const handleAsk = async (e: React.FormEvent) => {
   e.preventDefault() // prevent page reload
   const res = await askAI(input)
   setResponse(res)
@@ -205,33 +205,44 @@ const handleAsk = async (e: React.FormEvent) => {
       <div onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
         <div className="flex transition-transform duration-300 ease-out" style={{ transform: `translateX(-${currentPage * 100}%)` }}>
           <div className="w-full flex-shrink-0 p-6">
-            <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><Dumbbell className="h-5 w-5" /> Workouts</h2>
+            <h2 className="text-xl font-bold mb-4 flex items-center justify-center gap-2"><Dumbbell className="h-5 w-5" /> Workouts</h2>
+            {/* TODAYS WORKOUT CARD */}
+            <Card className="mb-4 border border-black bg-blue-50">
+              <CardContent className="p-4">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="font-semibold text-lg">Today's Workout</h3>
+                  {todayIndex !== null && (
+                    <span className="text-sm text-blue-600 font-medium">
+                      {muscleGroups[todayIndex]}
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-gray-600 mb-3">
+                  {todayIndex === 6 ? "Rest day – focus on recovery!" : "Ready to crush your workout?"}
+                </p>
+                <Button className="w-full">
+                  {todayIndex === 6 ? "View Recovery Tips" : "Start Workout"}
+                </Button>
+              </CardContent>
+            </Card>
             {/* CALENDAR PART */}
-            <div className="grid grid-cols-7 gap-2 mb-6">
+            <div className="space-y-3 mb-4">
             {todayIndex !== null && daysOfWeek.map((day, i) => (
-                <Card key={day} className={`cursor-pointer ${i === todayIndex ? "bg-blue-50 ring-2 ring-blue-500" : ""}`}>
-                  <CardContent className="p-2 text-center text-sm">
-                    <div>{day}</div>
-                    <div className="text-xs text-gray-500">{muscleGroups[i]}</div>
-                    {i === todayIndex && <Badge variant="secondary" className="mt-1">Today</Badge>}
+                <Card key={day} className={`cursor-pointer ${i === todayIndex ? "bg-blue-100 ring-2 ring-blue-500" : ""}`}>
+                  <CardContent className="p-2 flex items-center justify-between text-sm">
+                  <div className="font-medium">{day}</div>
+                  <div className="text-xs text-gray-500 text-right">
+                    {muscleGroups[i]}
+                  </div>
                   </CardContent>
                 </Card>
               ))}
             </div>
-            {/* TODAYS WORKOUT CARD */}
-            <Card>
-              <CardContent className="p-4">
-                <h3 className="font-semibold">Today's Workout</h3>
-                <p className="text-sm text-gray-600 mb-3">
-                  {todayIndex === 6 ? "Rest day - focus on recovery!" : "Ready to crush your workout?"}
-                </p>
-                <Button className="w-full">{todayIndex === 6 ? "View Recovery Tips" : "Start Workout"}</Button>
-              </CardContent>
-            </Card>
+            
           </div>
   {/* PROGRESS PAGE */}
           <div className="w-full flex-shrink-0 p-6">
-            <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><Bot className="h-5 w-5" /> Progress</h2>
+            <h2 className="text-xl font-bold mb-4 flex items-center justify-center gap-2"><Bot className="h-5 w-5" /> Progress</h2>
             {/* AI ASSISTANT PART */}
             <Card className="mb-4">
               <CardContent className="p-4">
@@ -252,39 +263,41 @@ const handleAsk = async (e: React.FormEvent) => {
           {/* TRENDS PART */}
             <div className="grid grid-cols-2 gap-4">
               <Card><CardContent className="text-center"><TrendingUp className="h-6 w-6 mx-auto" /><div>7-Day Streak</div></CardContent></Card>
-              <Card><CardContent className="text-center"><Dumbbell className="h-6 w-6 mx-auto" /><div>12 Workouts this Week</div></CardContent></Card>
+              <Card><CardContent className="text-center"><Dumbbell className="h-6 w-6 mx-auto" /><div>12 Workouts this Month</div></CardContent></Card>
             </div>
           </div>
   {/* MEALS PAGE */}
           <div className="w-full flex-shrink-0 p-6">
-            <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><UtensilsCrossed className="h-5 w-5" /> Meals</h2>
+            <h2 className="text-xl font-bold mb-4 flex items-center justify-center gap-2"><UtensilsCrossed className="h-5 w-5" /> Meals</h2>
             {/* CALORIE TRACKER */}
             <Card className="mb-4">
               <CardContent className="text-center">
-                <div className="text-2xl font-bold">{curr_cals}</div>
-                <div className="text-sm text-gray-600 mb-2">of {total_cals} calories</div>
+                <div className="flex justify-between items-baseline text-sm text-gray-600 mb-2">
+                  <div className="text-2xl font-bold text-black">{curr_cals} calories</div>
+                  <div>out of {total_cals} calories</div>
+                </div>
                 <Progress value={(curr_cals / total_cals) * 100} className="h-3" />
                 <div className="grid grid-cols-3 gap-3 mt-4">
                   <div className="text-center">
                     <div className="text-xs text-gray-500 mb-1">Carbs</div>
                     <Progress value={curr_carbs / total_carbs * 100} className="h-2" />
-                    <div className="text-xs text-gray-600 mt-1">{total_carbs}g</div>
+                    <div className="text-xs text-gray-600 mt-1">{curr_carbs}g out of {total_carbs}g</div>
                   </div>
                   <div className="text-center">
                     <div className="text-xs text-gray-500 mb-1">Protein</div>
                     <Progress value={curr_protein / total_protein * 100} className="h-2" />
-                    <div className="text-xs text-gray-600 mt-1">{total_protein}g</div>
+                    <div className="text-xs text-gray-600 mt-1">{curr_protein}g out of {total_protein}g</div>
                   </div>
                   <div className="text-center">
                     <div className="text-xs text-gray-500 mb-1">Fat</div>
                     <Progress value={curr_fats / total_fats * 100} className="h-2" />
-                    <div className="text-xs text-gray-600 mt-1">{total_fats}g</div>
+                    <div className="text-xs text-gray-600 mt-1">{curr_fats}g out of {total_fats}g</div>
                   </div>
                 </div>
               </CardContent>
             </Card>
             <Button size="lg" className="w-full mb-4">
-              <Link href="/meals/search" className="w-full h-full inline-block">
+            <Link href="/meals/search" className="w-full h-full flex items-center justify-center">
                 Log Calories
               </Link>
             </Button>
