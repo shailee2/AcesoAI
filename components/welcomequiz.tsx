@@ -7,24 +7,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import {
-  Dumbbell,
-  TrendingUp,
-  UtensilsCrossed,
   ChevronLeft,
   ChevronRight,
-  Send,
-  Bot,
-  Plus,
   User,
-  ArrowLeft,
   Target,
   Activity,
-  Clock,
 } from "lucide-react"
 
 interface QuizData {
@@ -35,7 +25,6 @@ interface QuizData {
     height: number
     fitnessGoal: string
     activityLevel: string
-    workoutDays: string[]
   }
 
   const WelcomeQuiz = ({ onComplete }: { onComplete: (userData: QuizData) => void }) => {
@@ -47,25 +36,13 @@ interface QuizData {
       height: 0,
       weight: 0,
       fitnessGoal: "",
-      activityLevel: "",
-      workoutDays: [],
+      activityLevel: ""
     })
   
     const updateQuizData = (field: keyof QuizData, value: any) => {
       setQuizData((prev) => ({ ...prev, [field]: value }))
     }
   
-    const handleArrayUpdate = (field: keyof QuizData, value: string, checked: boolean) => {
-      const currentArray = quizData[field] as string[]
-      if (checked) {
-        updateQuizData(field, [...currentArray, value])
-      } else {
-        updateQuizData(
-          field,
-          currentArray.filter((item) => item !== value),
-        )
-      }
-    }
   
     const canProceed = () => {
       switch (currentStep) {
@@ -77,8 +54,6 @@ interface QuizData {
           return quizData.fitnessGoal !== ""
         case 3:
           return quizData.activityLevel !== ""
-        case 4:
-          return quizData.workoutDays.length > 0
         default:
           return false
       }
@@ -150,7 +125,7 @@ interface QuizData {
                 id="height"
                 placeholder="Enter your height"
                 value={quizData.height}
-                onChange={(e) => updateQuizData("height", e.target.value)}
+                onChange={(e) => updateQuizData("height", Number(e.target.value))}
                 className="mt-1"
               />
             </div>
@@ -162,7 +137,7 @@ interface QuizData {
                 id="weight"
                 placeholder="Enter your weight"
                 value={quizData.weight}
-                onChange={(e) => updateQuizData("weight", e.target.value)}
+                onChange={(e) => updateQuizData("weight", Number(e.target.value))}
                 className="mt-1"
               />
             </div>
@@ -200,9 +175,11 @@ interface QuizData {
           <RadioGroup value={quizData.activityLevel} onValueChange={(value) => updateQuizData("activityLevel", value)}>
             <div className="space-y-3">
               {[
-                { value: "beginner", label: "Beginner", desc: "New to fitness or returning after a break" },
-                { value: "intermediate", label: "Intermediate", desc: "Work out 2-3 times per week regularly" },
-                { value: "advanced", label: "Advanced", desc: "Work out 4+ times per week consistently" },
+                { value: "1", label: "Sedentary", desc: "ex. Office worker with no exercise routine." },
+                { value: "2", label: "Lightly Active", desc: "ex. Someone who walks a lot at work or goes to the gym twice a week." },
+                { value: "3", label: "Moderately Active", desc: "ex. Gym-goer lifting or doing cardio most weekdays." },
+                { value: "4", label: "Very Active", desc: "ex. Athlete, personal trainer, or someone with daily intense workouts." },
+                { value: "5", label: "Extra Active", desc: "ex. Marathon runner in training or someone doing manual labor + daily gym sessions."},
               ].map((level) => (
                 <div key={level.value} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
                   <RadioGroupItem value={level.value} id={level.value} />
@@ -214,31 +191,6 @@ interface QuizData {
               ))}
             </div>
           </RadioGroup>
-        ),
-      },
-      {
-        title: "What days do you prefer to work out?",
-        icon: Clock,
-        content: (
-          <div className="space-y-6">
-            <div>
-              <Label className="text-sm font-medium mb-3 block">Which days work best for you?</Label>
-              <div className="grid grid-cols-2 gap-2">
-                {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
-                  <div key={day} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={day}
-                      checked={quizData.workoutDays.includes(day)}
-                      onCheckedChange={(checked) => handleArrayUpdate("workoutDays", day, checked as boolean)}
-                    />
-                    <Label htmlFor={day} className="text-sm">
-                      {day}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
         ),
       }
     ]
