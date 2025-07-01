@@ -1,8 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0f0f0f;
+  --foreground: #ededed;
+  --card: #1c1c1c;
+  --card-foreground: #ededed;
+  --primary: #ff3c38;
+  --primary-foreground: #ededed;
+  --accent: #ffc857;
+  --success: #21d375;
+  --muted: #aaaaaa;
+  --border: #333333;
 }
 
 @theme inline {
@@ -12,15 +20,378 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+body {
+  background: #0f0f0f;
+  color: #ededed;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Page-specific animated backgrounds */
+.workout-bg {
+  background: linear-gradient(-45deg, #0f0f0f, #1a0a0a, #1a0f0a, #0f0f0f);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+}
+
+.progress-bg {
+  background: linear-gradient(-45deg, #0f0f0f, #0a0a1a, #0f0a1a, #0f0f0f);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+}
+
+.nutrition-bg {
+  background: linear-gradient(-45deg, #0f0f0f, #0a1a0a, #0f1a0f, #0a1a0f);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Floating particles with page-specific colors */
+.particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  animation: float 20s infinite linear;
+  opacity: 0.3;
+}
+
+.particle.workout {
+  background: #ff3c38;
+}
+
+.particle.workout:nth-child(2n) {
+  background: #ff6b47;
+  animation-duration: 25s;
+}
+
+.particle.workout:nth-child(3n) {
+  background: #ff8c42;
+  animation-duration: 30s;
+}
+
+.particle.progress {
+  background: #3b82f6;
+}
+
+.particle.progress:nth-child(2n) {
+  background: #6366f1;
+  animation-duration: 25s;
+}
+
+.particle.progress:nth-child(3n) {
+  background: #8b5cf6;
+  animation-duration: 30s;
+}
+
+.particle.nutrition {
+  background: #21d375;
+}
+
+.particle.nutrition:nth-child(2n) {
+  background: #228b22;
+  animation-duration: 25s;
+}
+
+.particle.nutrition:nth-child(3n) {
+  background: #2e7d32;
+  animation-duration: 30s;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.3;
+  }
+  90% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(-100px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Custom scrollbar with page-specific colors */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1c1c1c;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+}
+
+.workout-page ::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #ff3c38, #ff8c42);
+}
+
+.progress-page ::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+}
+
+.nutrition-page ::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #21d375, #228b22);
+}
+
+/* Page-specific text effects */
+.workout-text {
+  background: linear-gradient(135deg, #ff3c38 0%, #ff8c42 100%);
+  background-size: 200% 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  animation: textShimmer 3s ease-in-out infinite;
+}
+
+.progress-text {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  background-size: 200% 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  animation: textShimmer 3s ease-in-out infinite;
+}
+
+.nutrition-text {
+  background: linear-gradient(135deg, #21d375 0%, #228b22 100%);
+  background-size: 200% 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  animation: textShimmer 3s ease-in-out infinite;
+}
+
+@keyframes textShimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Card hover animations - NO GLOW */
+.stat-card {
+  background: linear-gradient(135deg, #1c1c1c 0%, #2a2a2a 100%);
+  border: 1px solid #333333;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+  transition: left 0.5s;
+}
+
+.stat-card:hover::before {
+  left: 100%;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px) scale(1.01);
+}
+
+.workout-card:hover {
+  border-color: #ff3c38;
+  box-shadow: 0 10px 30px rgba(255, 60, 56, 0.1);
+}
+
+.progress-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.1);
+}
+
+.nutrition-card:hover {
+  border-color: #21d375;
+  box-shadow: 0 10px 30px rgba(33, 211, 117, 0.1);
+}
+
+/* Number counter animation */
+.counter {
+  display: inline-block;
+  animation: countUp 1s ease-out;
+}
+
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Progress bar animations - REMOVED FADE EFFECT */
+.progress-animated {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Button press effect - NO GLOW */
+.btn-press {
+  transition: all 0.1s ease;
+}
+
+.btn-press:active {
+  transform: scale(0.95);
+}
+
+/* Floating action button - NO GLOW */
+.fab {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  animation: fabPulse 2s ease-in-out infinite;
+  z-index: 1000;
+}
+
+.workout-fab {
+  background: linear-gradient(45deg, #ff3c38, #ff8c42);
+  box-shadow: 0 8px 20px rgba(255, 60, 56, 0.2);
+}
+
+.progress-fab {
+  background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
+}
+
+.nutrition-fab {
+  background: linear-gradient(45deg, #21d375, #228b22);
+  box-shadow: 0 8px 20px rgba(33, 211, 117, 0.2);
+}
+
+@keyframes fabPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Streak fire animation */
+.streak-fire {
+  position: relative;
+}
+
+.streak-fire::after {
+  content: "🔥";
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  font-size: 20px;
+  animation: fireFlicker 1s ease-in-out infinite alternate;
+}
+
+@keyframes fireFlicker {
+  0% {
+    transform: scale(1) rotate(-5deg);
+  }
+  100% {
+    transform: scale(1.2) rotate(5deg);
+  }
+}
+
+/* Level up animation */
+.level-badge {
+  position: relative;
+  animation: levelPulse 3s ease-in-out infinite;
+}
+
+@keyframes levelPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+/* Workout intensity bars */
+.intensity-bar {
+  height: 4px;
+  background: #333333;
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.intensity-fill {
+  height: 100%;
+  border-radius: 2px;
+  animation: intensityPulse 1.5s ease-in-out infinite;
+}
+
+.workout-intensity {
+  background: linear-gradient(90deg, #ff8c42, #ff3c38);
+}
+
+.progress-intensity {
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+}
+
+.nutrition-intensity {
+  background: linear-gradient(90deg, #21d375, #228b22);
+}
+
+@keyframes intensityPulse {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
 }

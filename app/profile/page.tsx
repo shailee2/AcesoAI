@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Clock, Target, User } from "lucide-react"
+import { ArrowLeft, Target, User } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 type QuizData = {
@@ -17,12 +16,12 @@ type QuizData = {
   activityLevel: string
 }
 const activityLevelMap: Record<string, string> = {
-    "1": "Sedentary",
-    "2": "Lightly Active",
-    "3": "Moderately Active",
-    "4": "Very Active",
-    "5": "Extra Active",
-  }
+  "1": "Sedentary",
+  "2": "Lightly Active",
+  "3": "Moderately Active",
+  "4": "Very Active",
+  "5": "Extra Active",
+}
 
 export default function ProfilePage() {
   const [userData, setUserData] = useState<QuizData>({
@@ -32,7 +31,7 @@ export default function ProfilePage() {
     height: 0,
     weight: 0,
     fitnessGoal: "",
-    activityLevel: ""
+    activityLevel: "",
   })
 
   const router = useRouter()
@@ -45,15 +44,15 @@ export default function ProfilePage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow-sm border-b p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800">
+      <div className="bg-gray-900/80 backdrop-blur-md shadow-2xl border-b border-gray-700 p-4">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="sm" onClick={() => router.back()}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-xl font-bold">Profile</h1>
-            <p className="text-sm text-gray-600">Your personal information</p>
+            <h1 className="text-xl font-bold text-white neon-text">Profile</h1>
+            <p className="text-sm text-gray-400">Your personal information</p>
           </div>
         </div>
       </div>

@@ -8,9 +8,15 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className
     <input
       ref={ref}
       className={cn(
-        "flex h-10 w-full rounded-md border border-gray-300 px-3 py-2 text-sm ring-offset-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
-        className
+        "flex h-12 w-full rounded-xl border-2 px-4 py-3 placeholder:text-gray-400 focus:outline-none focus:ring-2 transition-all duration-200",
+        className,
       )}
+      style={{
+        backgroundColor: "#1c1c1c",
+        borderColor: "#333333",
+        color: "#ededed",
+        ["--placeholder-color" as any]: "#aaaaaa",
+      }}
       {...props}
     />
   )

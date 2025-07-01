@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Plus, UtensilsCrossed } from "lucide-react"
 import { Progress } from "@/components/ui/progress"
+import { Input } from "@/components/ui/input"
 
 export default function MealsPage() {
   const [dailyCalories] = useState({ current: 1650, target: 2200 })
@@ -20,6 +21,18 @@ export default function MealsPage() {
     { id: 3, name: "Salmon & Veggies", calories: 380 },
     { id: 4, name: "Greek Yogurt Bowl", calories: 280 },
   ]
+  const [showFoodSearch, setShowFoodSearch] = useState(false)
+  const [searchInput, setSearchInput] = useState("")
+  const [searchResults, setSearchResults] = useState([])
+  const fetchFood = async (query: string) => {
+    const res = await fetch("/api/food-search", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query }),
+    })
+    const data = await res.json()
+    setSearchResults(data.products || [])
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -53,10 +66,58 @@ export default function MealsPage() {
         </CardContent>
       </Card>
 
-      <Button className="w-full" onClick={() => (window.location.href = "/meals/search")}>
-        <Plus className="h-4 w-4 mr-2" />
+      <Button
+        size="lg"
+        className="w-full mb-4"
+        onClick={async () => {
+          const response = await fetch("/foodapi/ask", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ query: "banana" }), // replace with dynamic input
+          })
+
+          const data = await response.json()
+          console.log("Nutrition Info:", data)
+        }}
+      >
         Log Calories
       </Button>
+
+      {showFoodSearch && (
+        <div className="mb-6 space-y-4">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              fetchFood(searchInput)
+            }}
+            className="flex gap-2"
+          >
+            <Input
+              placeholder="Search for food (e.g. banana)"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
+            <Button type="submit">Search</Button>
+          </form>
+
+          {searchResults.length > 0 && (
+            <div className="space-y-2">
+              {searchResults.map((item: any) => (
+                <Card key={item.code}>
+                  <CardContent className="p-3">
+                    <div className="font-medium">{item.product_name || "Unnamed Product"}</div>
+                    <div className="text-sm text-gray-600">
+                      {item.nutriments?.energy_kcal || "?"} kcal
+                      {item.nutriments?.proteins && ` • ${item.nutriments.proteins}g protein`}
+                    </div>
+                    {/* Optional future feature: Add button to track this meal */}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Meal Sections */}
       <div className="grid grid-cols-2 gap-4">
