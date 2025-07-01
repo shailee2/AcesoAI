@@ -529,7 +529,7 @@ return (
             </Card>
 
             <Button size="lg" className="w-full mb-6 btn-press" style={{ backgroundColor: "#255235" }}>
-              <Link href="/meals/search" className="w-full h-full flex items-center justify-center">
+              <Link href="/meals" className="w-full h-full flex items-center justify-center">
                 LOG CALORIES
               </Link>
             </Button>

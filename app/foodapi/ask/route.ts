@@ -1,14 +1,10 @@
-// app/foodapi/ask/route.ts
-
 import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(req: NextRequest) {
-  const body = await req.json()
-  const query = body.query
+  const { query } = await req.json()
 
-  // call your external food API here (like Open Food Facts or Nutritionix)
-  const result = await fetch(`https://api.example.com/search?food=${query}`)
-  const nutrition = await result.json()
+  const res = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1`)
+  const data = await res.json()
 
-  return NextResponse.json(nutrition)
+  return NextResponse.json(data)
 }
