@@ -19,17 +19,18 @@ interface FoodItem {
 export default function FoodDetailPage() {
   const [food, setFood] = useState<FoodItem | null>(null)
   const [servingMultiplier, setServingMultiplier] = useState(1)
+  const [loggedMeals, setLoggedMeals] = useState<FoodItem[]>([])
   const router = useRouter()
   const [unit, setUnit] = useState("serving")
   const unitMultipliers: Record<string, number> = {
-    serving: 1,
+    serving: 100,
     g: 1,
     oz: 28.35,
     ml: 1,
-    cup: 240,
+    cup: 250,
   }
-  
 
+  
 
   useEffect(() => {
     const data = localStorage.getItem("selectedFood")
@@ -98,6 +99,7 @@ export default function FoodDetailPage() {
             type="number"
             min={0.1}
             step={0.1}
+            defaultValue={1}
             value={servingMultiplier}
             onChange={(e) => setServingMultiplier(Number(e.target.value))}
             className="w-24 text-black"
@@ -126,9 +128,9 @@ export default function FoodDetailPage() {
       {food && (
         <>
             <p>Calories: {Math.round((food.calories ?? 0) * (servingMultiplier * unitMultipliers[unit]) / 100)}</p>
-            <p>Protein: {Math.round((food.protein ?? 0) * (servingMultiplier * unitMultipliers[unit]) / 100 * 10) / 10}g</p>
-            <p>Carbs: {Math.round((food.carbs ?? 0) * (servingMultiplier * unitMultipliers[unit]) / 100 * 10) / 10}g</p>
-            <p>Fat: {Math.round((food.fat ?? 0) * (servingMultiplier * unitMultipliers[unit]) / 100 * 10) / 10}g</p>
+            <p>Protein: {Math.round(((food.protein ?? 0) * (servingMultiplier * unitMultipliers[unit]) / 100 * 10) / 10)}g</p>
+            <p>Carbs: {Math.round(((food.carbs ?? 0) * (servingMultiplier * unitMultipliers[unit]) / 100 * 10) / 10)}g</p>
+            <p>Fat: {Math.round(((food.fat ?? 0) * (servingMultiplier * unitMultipliers[unit]) / 100 * 10) / 10)}g</p>
 
         </>
         )}
@@ -138,7 +140,9 @@ export default function FoodDetailPage() {
       <Button
         className="mt-4"
         style={{ backgroundColor: "#16a34a", color: "#f0fdf4" }}
-        onClick={logFood}
+        onClick={
+          logFood
+        }
       >
         Log This Food
       </Button>

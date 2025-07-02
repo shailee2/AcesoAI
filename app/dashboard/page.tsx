@@ -13,12 +13,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Send,
-  Flame,
-  Target,
   Zap,
   Play,
   Plus,
-  Timer,
   BarChart3,
 } from "lucide-react"
 import WelcomeQuiz, { QuizData } from "@/components/welcomequiz"
@@ -28,6 +25,22 @@ import { marked } from "marked"
 import { Settings } from "lucide-react"
 import { Dropdown } from "@/components/ui/dropdown"
 import { useRouter } from "next/navigation"
+import { Trash2 } from "lucide-react"
+
+
+
+interface FoodItem {
+  id: string
+  name: string
+  calories: number
+  protein: number
+  carbs: number
+  fat: number
+  serving_size: string
+  brand?: string
+  image?: string
+}
+
 
 const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 const muscleGroups = ["Chest", "Back", "Legs", "Shoulders", "Arms", "Core", "Rest"]
@@ -57,7 +70,7 @@ export default function DashboardPage() {
   const [isQuizCompleted, setIsQuizCompleted] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const searchParams = useSearchParams()
-  const initialPage = Number(searchParams.get("page")) || 1
+  const initialPage = searchParams.get("page") !== null ? Number(searchParams.get("page")) : 1
   const [currentPage, setCurrentPage] = useState(initialPage)
   const [touchStart, setTouchStart] = useState(0)
   const [touchEnd, setTouchEnd] = useState(0)
@@ -65,6 +78,17 @@ export default function DashboardPage() {
   const [todayIndex, setTodayIndex] = useState<number | null>(null)
   const [workoutTimer, setWorkoutTimer] = useState(0)
   const [isWorkoutActive, setIsWorkoutActive] = useState(false)
+  const [loggedMeals, setLoggedMeals] = useState<FoodItem[]>([])
+  const [curr_cals, setCurrCals] = useState(0)
+  const [curr_carbs, setCurrCarbs] = useState(0)
+  const [curr_protein, setCurrProtein] = useState(0)
+  const [curr_fats, setCurrFats] = useState(0)
+
+  const deleteMeal = (indexToDelete: number) => {
+    const updatedMeals = loggedMeals.filter((_, index) => index !== indexToDelete)
+    setLoggedMeals(updatedMeals)
+    localStorage.setItem("loggedMeals", JSON.stringify(updatedMeals))
+  }  
   const router = useRouter()
   const [userData, setUserData] = useState<QuizData>({
     name: "Name",
@@ -80,6 +104,37 @@ export default function DashboardPage() {
     1: { type: "progress", bgClass: "progress-bg", fabClass: "progress-fab" },
     2: { type: "nutrition", bgClass: "nutrition-bg", fabClass: "nutrition-fab" },
   }
+
+  useEffect(() => {
+    const stored = localStorage.getItem("loggedMeals")
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored)
+        setLoggedMeals(parsed)
+      } catch (e) {
+        console.error("Error parsing logged meals:", e)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    const today = new Date().toDateString() // e.g., "Tue Jul 2 2025"
+    const lastReset = localStorage.getItem("lastResetDate")
+  
+    if (lastReset !== today) {
+      // Clear meals and reset macros
+      localStorage.removeItem("loggedMeals")
+      setLoggedMeals([])
+      setCurrCals(0)
+      setCurrCarbs(0)
+      setCurrProtein(0)
+      setCurrFats(0)
+  
+      // Update the last reset date
+      localStorage.setItem("lastResetDate", today)
+    }
+  }, [])
+  
 
   const currentPageConfig = pageConfigs[currentPage as keyof typeof pageConfigs]
   useEffect(() => {
@@ -108,8 +163,7 @@ export default function DashboardPage() {
     }
     return age
   }
-  
-  // Calculating Macros
+  //MACROS
   const total_cals = (() => {
     const age = getAge(userData.birthday)
     const weight = Number(userData.weight)
@@ -142,6 +196,7 @@ export default function DashboardPage() {
       case "get_fit":
         tdee -= 100
         break
+
     }
     return Math.round(tdee)
   })()
@@ -174,17 +229,35 @@ export default function DashboardPage() {
   const total_protein = Math.round(pr * total_cals / 4)
   const total_fats = Math.round(fr * total_cals / 9)
   const total_carbs = Math.round(cr * total_cals / 4)
-  //Current macros -- will have to change with calorie tracking.
-  const curr_cals = 100
-  const curr_carbs = 100
-  const curr_protein = 100
-  const curr_fats = 30
-  const workoutStreak = 12
-  const weeklyWorkouts = 5
-  const totalWeeklyGoal = 7
-  const caloriesBurned = 2450
-  const userLevel = 8
-  const todayIntensity = 85 // out of 100
+//MACRO TRACKING
+  useEffect(() => {
+    const stored = localStorage.getItem("loggedMeals")
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored)
+        setLoggedMeals(parsed)
+
+        const totals = parsed.reduce(
+          (acc: { cals: number; carbs: number; protein: number; fats: number }, meal: any) => {
+            acc.cals += meal.calories || 0
+            acc.carbs += meal.carbs || 0
+            acc.protein += meal.protein || 0
+            acc.fats += meal.fat || 0
+            return acc
+          },
+          { cals: 0, carbs: 0, protein: 0, fats: 0 }
+        )
+
+        setCurrCals(Math.round(totals.cals))
+        setCurrCarbs(Math.round(totals.carbs))
+        setCurrProtein(Math.round(totals.protein))
+        setCurrFats(Math.round(totals.fats))
+      } catch (e) {
+        console.error("Error parsing logged meals:", e)
+      }
+    }
+  }, [])
+
 
   
   const askAI = async (prompt: string) => {
@@ -476,7 +549,7 @@ return (
             </div>
           </div>
   {/* MEALS PAGE */}
-          {/* NUTRITION PAGE - Green/Forest Green Theme */}
+          {/* NUTRITION PAGE */}
           <div className="w-full flex-shrink-0 p-6 relative z-10 nutrition-page">
             <div className="mb-8 text-center">
               <h1 className="text-5xl font-black mb-2 nutrition-text">
@@ -534,28 +607,29 @@ return (
               </Link>
             </Button>
 
-            {/* Quick nutrition stats */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-4 mb-8">
               <Card className="stat-card nutrition-card">
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-black mb-1" style={{ color: "#21d375" }}>
-                    8
+                <CardContent className="p-6">
+                  <div className="text-center">
+                    <h2 className="text-2xl font-bold mb-4 text-green-400">Logged Meals</h2>
                   </div>
-                  <div className="text-xs" style={{ color: "#aaaaaa" }}>
-                    Glasses of Water
-                  </div>
-                  <Progress value={80} variant="nutrition" className="mt-2" />
-                </CardContent>
-              </Card>
-              <Card className="stat-card nutrition-card">
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-black mb-1" style={{ color: "#228b22" }}>
-                    5
-                  </div>
-                  <div className="text-xs" style={{ color: "#aaaaaa" }}>
-                    Meals Logged
-                  </div>
-                  <Progress value={100} variant="nutrition" className="mt-2" />
+                  {loggedMeals.length === 0 ? (
+                    <p className="text-white text-center">No meals logged yet.</p>
+                  ) : (
+                    <ul className="space-y-4">
+                      {loggedMeals.map((meal, index) => (
+                        <li key={index} className="p-3 rounded border border-green-700">
+                          <p className="text-white text-base font-semibold mb-1">{meal.name}</p>
+                          <div className="flex justify-between items-center">
+                            <p className="text-green-400 text-sm">{meal.calories} calories</p>
+                            <button onClick={() => deleteMeal(index)} className="text-red-800 hover:text-red-200">
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </CardContent>
               </Card>
             </div>
